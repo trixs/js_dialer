@@ -16,7 +16,7 @@ $ npm eslint
 $ npm test
 ```
 
-##Design
+## Design
 Activities related to concurrent dialing are implemented in methods
 ``dialingWrapper`` and ``connect``. The former deals with dialing a single
 phone number and processing the result, or handling an exception. The latter
