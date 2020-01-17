@@ -42,8 +42,7 @@ class PowerDialer {
      */
     onAgentLogin() {
         if (this.agentState !== AgentState.UNAVAILABLE) {
-            const msg = `Agent "${this.agentId}" must be in UNAVAILABLE state. `
-                + `Current state is "${this.agentState}"`;
+            const msg = `Agent "${this.agentId}" must be in UNAVAILABLE state. Current state is "${this.agentState}"`;
             logger.error(msg);
             throw new Error(msg);
         }
@@ -71,8 +70,7 @@ class PowerDialer {
      */
     onCallStarted(leadPhoneNumber) {
         if (this.agentState !== AgentState.WAITING) {
-            const msg = (`Agent "${this.agentId}" must be in WAITING state. `
-                   + `Current state is "${this.agentState}"`);
+            const msg = (`Agent "${this.agentId}" must be in WAITING state. Current state is "${this.agentState}"`);
             logger.error(msg);
             throw new Error(msg);
         }
@@ -85,8 +83,7 @@ class PowerDialer {
      */
     onCallFailed() {
         if (this.agentState !== AgentState.BUSY) {
-            const msg = `Agent "${this.agentId}" must be in BUSY state. `
-                   + `Current state is "${this.agentState}"`;
+            const msg = `Agent "${this.agentId}" must be in BUSY state. Current state is "${this.agentState}"`;
             logger.error(msg);
             throw new Error(msg);
         }
@@ -107,8 +104,7 @@ class PowerDialer {
      */
     onCallEnded() {
         if (this.agentState !== AgentState.BUSY) {
-            const msg = `Agent "${this.agentId}" must be in BUSY state. `
-                   + `Current state is "${this.agentState}"`;
+            const msg = `Agent "${this.agentId}" must be in BUSY state. Current state is "${this.agentState}"`;
             logger.error(msg);
             throw new Error(msg);
         }
@@ -136,13 +132,12 @@ class PowerDialer {
             logger.error(msg);
             throw new Error(msg);
         }
-        if (connState === CallState.CONNECTED) {
-            return phoneNumber;
+        if (connState !== CallState.CONNECTED) {
+            const msg = `Failed dialing "${phoneNumber}" for agent "${this.agentId}" failed. Call ended in state: "${connState}"`;
+            logger.warn(msg);
+            throw new Error(msg);
         }
-        const msg = `Failed dialing "${phoneNumber}" for agent "${this.agentId}" failed. Call ended in state: "${connState}"`;
-        logger.warn(msg);
-        throw new Error(msg);
-
+        return phoneNumber;
     }
 
     /**
@@ -151,8 +146,7 @@ class PowerDialer {
     async connect() {
         // First let's ensure that agent is available
         if (this.agentState !== AgentState.AVAILABLE) {
-            const msg = `Agent "${this.agentId}" must be in AVAILABLE state. `
-                   + `Current state is "${this.agentState}"`;
+            const msg = `Agent "${this.agentId}" must be in AVAILABLE state. Current state is "${this.agentState}"`;
             logger.error(msg);
             throw new Error(msg);
         }
@@ -188,19 +182,19 @@ class PowerDialer {
                 try {
                     connectedNumber = await BlueBird.any(this.promises);
                 } catch (ex) {
-                    // ignore exceptions here. They are logged by dialing service
+                    // ignore aggregate error, when all dialing attempts fail
                 }
                 if (connectedNumber) {
                     this.onCallStarted(connectedNumber);
                     shouldRetry = false;
                 }
-                // in a proper application one would use the remaining connected calls
-                // to be connnected with other agents in the pool
             } else {
                 // no more leads in the database
                 this.agentState = AgentState.AVAILABLE;
                 shouldRetry = false;
             }
+            // in a proper application one would use the remaining connected calls
+            // to be connnected with other agents in the pool
         }
     }
 }
