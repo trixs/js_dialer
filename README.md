@@ -1,4 +1,6 @@
 # Concurrent dialer
+[![Travis build status badge](https://travis-ci.org/trixs/js_dialer.svg?branch=master)](https://travis-ci.org/trixs/js_dialer)
+[![Code coverage status badge](https://coveralls.io/repos/github/trixs/js_dialer/badge.svg)](https://coveralls.io/github/trixs/js_dialer)
 
 Test application demonstrating skills using promises.
 
